@@ -16,18 +16,20 @@ def adaptModel(m, option):
     elif option != "Google Gemini":
         if m["role"] == "model":
             return {"role": "assistant", "content": m["parts"]}
+        elif m["role"] == "assistant":
+            return {"role": "assistant", "content": m["parts"]}
         else:
             return {"role": "user", "content": m["parts"]}
 
 st.title("AI Powered Search - for those who being blocked")
-st.subheader("Lots of bugs, dont expected too much, donate to extend the tokens.")
+st.subheader("Lots of bugs, dont expected too much, donate to extend the tokens.", divider="rainbow")
 st.image("alipay.png", width=100)
-st.write("Drop message to :blue[Henry] (_if you know him_) if met 🐞🐛.", divider="rainbow")
+st.write("Drop message to :blue[Henry] (_if you know him_) if met 🐞🐛.")
 st.write("Initially to support the very BAD Girl Mr. Jiaqi, donate to switch to the Good Man.")
 
 option = st.selectbox(
     "Select AI Model:",
-    ("Google Gemini", "DeepSeek-Chat", "DeekSeek-Reasoner"),
+    ("Google Gemini", "DeepSeek-Chat", "DeepSeek-Reasoner"),
 )
 
 genai.configure(api_key=st.secrets["AITK"])
@@ -62,6 +64,8 @@ for message in st.session_state.messages:
 
 if prompt := st.chat_input("What is up?"):
     print(prompt)
+    print([adaptModel(m, option) for m in st.session_state.messages])
+
     st.session_state.messages.append({"role": "user", "parts": prompt})
     with st.chat_message("user"):
         st.markdown(prompt)
@@ -102,9 +106,10 @@ if prompt := st.chat_input("What is up?"):
                     if chunk.choices[0].delta.content is not None:
                         full_response += chunk.choices[0].delta.content
                         message_placeholder.markdown(full_response + "▌")
-            elif option == "DeekSeek-Reasoner":
+            elif option == "DeepSeek-Reasoner":
+                print("deepseek-r")
                 completion = model2.chat.completions.create(
-                    model="deepseek-coder",
+                    model="deepseek-reasoner",
                     messages=[
                         # {"role": m["role"], "content": m["parts"]}
                         adaptModel(m, option)
