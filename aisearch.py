@@ -56,9 +56,18 @@ if prompt := st.chat_input("What is up?"):
         full_response = ""
         try:
             if option == "Google Gemini":
-                response = model.generate_content(prompt)
-                print(response.text)
-                full_response = response.text
+                completion = model.generate_content(
+                    [
+                        {"role": m["role"], "parts": m["parts"]}
+                        for m in st.session_state.messages
+                    ],
+                    stream=True,
+                )
+                for chunk in completion:
+                    print(chunk);
+                    full_response += chunk.text
+                    print(full_response);
+                    message_placeholder.markdown(full_response + "▌")
             elif option == "DeepSeek-Chat":
                 completion = model2.chat.completions.create(
                     model="deepseek-chat",
