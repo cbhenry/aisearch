@@ -74,9 +74,9 @@ if prompt := st.chat_input("What is up?"):
                     stream=True,
                 )
                 for chunk in completion:
-                    print(chunk);
+                    print(chunk)
                     full_response += chunk.text
-                    print(full_response);
+                    print(full_response)
                     message_placeholder.markdown(full_response + "▌")
             elif option == "DeepSeek-Chat":
                 completion = model2.chat.completions.create(
