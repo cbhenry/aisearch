@@ -20,9 +20,10 @@ def adaptModel(m, option):
             return {"role": "user", "content": m["parts"]}
 
 st.title("AI Powered Search - for those who being blocked")
-st.subheader("Lots of bugs, dont expected to much, donate to extend the tokens.")
+st.subheader("Lots of bugs, dont expected too much, donate to extend the tokens.")
 st.image("alipay.png", width=100)
 st.write("Drop message to :blue[Henry] (_if you know him_) if met 🐞🐛.", divider="rainbow")
+st.write("Initially to support the very BAD Girl Mr. Jiaqi, donate to switch to the Good Man.")
 
 option = st.selectbox(
     "Select AI Model:",
