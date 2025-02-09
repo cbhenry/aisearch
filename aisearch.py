@@ -5,10 +5,19 @@ import json
 
 print('* Enter the application')
 
-def adaptModel(message, option):
-    if option == "Google Gemini" and message["role"] == "assistant":
-        message["role"] = 'model'
-    return message
+def adaptModel(m, option):
+    if option == "Google Gemini":
+        if m["role"] == "user":
+            return {"role": "user", "parts": m["parts"]}
+        elif m["role"] == "model":
+            return {"role": "model", "parts": m["parts"]}
+        elif m["role"] == "assistant":
+            return {"role": "model", "parts": m["parts"]}
+    elif option != "Google Gemini":
+        if m["role"] == "model":
+            return {"role": "assistant", "content": m["parts"]}
+        else:
+            return {"role": "user", "content": m["parts"]}
 
 st.title("AI Powered Search - for those who being blocked")
 st.subheader("Lots of bugs, dont expected to much, donate to extend the tokens.")
@@ -65,11 +74,11 @@ if prompt := st.chat_input("What is up?"):
         full_response = ""
         try:
             if option == "Google Gemini":
-                adapteModelMessage = [adaptModel(m, option) for m in st.session_state.messages]
                 completion = model.generate_content(
                     [
-                        {"role": m["role"], "parts": m["parts"]}
-                        for m in adapteModelMessage
+                        # {"role": m["role"], "parts": m["parts"]}
+                        adaptModel(m, option)
+                        for m in st.session_state.messages
                     ],
                     stream=True,
                 )
@@ -82,7 +91,8 @@ if prompt := st.chat_input("What is up?"):
                 completion = model2.chat.completions.create(
                     model="deepseek-chat",
                     messages=[
-                        {"role": m["role"], "content": m["parts"]}
+                        # {"role": m["role"], "content": m["parts"]}
+                        adaptModel(m, option)
                         for m in st.session_state.messages
                     ],
                     stream=True,
@@ -95,7 +105,8 @@ if prompt := st.chat_input("What is up?"):
                 completion = model2.chat.completions.create(
                     model="deepseek-coder",
                     messages=[
-                        {"role": m["role"], "content": m["parts"]}
+                        # {"role": m["role"], "content": m["parts"]}
+                        adaptModel(m, option)
                         for m in st.session_state.messages
                     ],
                     stream=True,
