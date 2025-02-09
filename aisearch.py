@@ -10,6 +10,11 @@ st.subheader("Lots of bugs, dont expected to much, donate to extend the tokens."
 st.image("alipay.png", width=100)
 st.write("Drop message to :blue[Henry] (_if you know him_) if met 🐞🐛.", divider="rainbow")
 
+option = st.selectbox(
+    "Select AI Model:",
+    ("Google Gemini", "DeepSeek-Chat", "DeekSeek-Reasoner"),
+)
+
 genai.configure(api_key=st.secrets["AITK"])
 model = genai.GenerativeModel(model_name='gemini-pro', safety_settings=[
         {
@@ -40,18 +45,17 @@ for message in st.session_state.messages:
         print("*** chat messages")
         st.markdown(message["parts"])
 
-option = st.selectbox(
-    "Select AI Model:",
-    ("Google Gemini", "DeepSeek-Chat", "DeekSeek-Reasoner"),
-)
-
 if prompt := st.chat_input("What is up?"):
     print(prompt)
     st.session_state.messages.append({"role": "user", "parts": prompt})
     with st.chat_message("user"):
         st.markdown(prompt)
 
-    with st.chat_message("assistant"):
+    assistant = "assistant"
+    if option == "Google Gemini":
+        assistant = "model"
+
+    with st.chat_message(assistant):
         message_placeholder = st.empty()
         full_response = ""
         try:
@@ -95,7 +99,7 @@ if prompt := st.chat_input("What is up?"):
                         full_response += chunk.choices[0].delta.content
                         message_placeholder.markdown(full_response + "▌")
             message_placeholder.markdown(full_response)
-            st.session_state.messages.append({"role": "assistant", "parts": full_response})
+            st.session_state.messages.append({"role": assistant, "parts": full_response})
         except Exception as e:
             print(e)
             st.toast(e, icon='🎉')
