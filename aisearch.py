@@ -5,6 +5,11 @@ import json
 
 print('* Enter the application')
 
+def adaptModel(message, option):
+    if option == "Google Gemini" and message["role"] == "assistant":
+        message["role"] = 'model'
+    return message
+
 st.title("AI Powered Search - for those who being blocked")
 st.subheader("Lots of bugs, dont expected to much, donate to extend the tokens.")
 st.image("alipay.png", width=100)
@@ -55,15 +60,16 @@ if prompt := st.chat_input("What is up?"):
     if option == "Google Gemini":
         assistant = "model"
 
-    with st.chat_message(assistant):
+    with st.chat_message("assistant"):
         message_placeholder = st.empty()
         full_response = ""
         try:
             if option == "Google Gemini":
+                adapteModelMessage = [adaptModel(m, option) for m in st.session_state.messages]
                 completion = model.generate_content(
                     [
                         {"role": m["role"], "parts": m["parts"]}
-                        for m in st.session_state.messages
+                        for m in adapteModelMessage
                     ],
                     stream=True,
                 )
@@ -99,7 +105,7 @@ if prompt := st.chat_input("What is up?"):
                         full_response += chunk.choices[0].delta.content
                         message_placeholder.markdown(full_response + "▌")
             message_placeholder.markdown(full_response)
-            st.session_state.messages.append({"role": assistant, "parts": full_response})
+            st.session_state.messages.append({"role": "assistant", "parts": full_response})
         except Exception as e:
             print(e)
             st.toast(e, icon='🎉')
